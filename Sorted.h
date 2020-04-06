@@ -92,6 +92,7 @@ public:
     const std::pair<K, V> &Top() const override { return queue.top().x; }
 
     void Pop() override {
+        if (Empty()) return;
         valid.erase(queue.top().x.first);
         queue.pop();
         PopTillValid();
@@ -149,7 +150,10 @@ public:
 
     const std::pair<K, V> &Top() const override { return set.begin()->x; }
 
-    void Pop() override { set.erase(set.begin()); }
+    void Pop() override {
+        if (Empty()) return;
+        set.erase(set.begin());
+    }
 
     bool Empty() const override { return set.empty(); }
 
