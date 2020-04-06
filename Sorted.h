@@ -6,6 +6,7 @@
 #include <queue>
 #include <set>
 #include <map>
+#include "Utils.h"
 
 template<typename Impl>
 class SortedInterface {
@@ -102,7 +103,10 @@ public:
 
     ~PriorityQueueSorted() override = default;
 
-    std::pair<K, V> Top() const override { return queue.top().x; }
+    std::pair<K, V> Top() const override {
+        Assert (!Empty());
+        return queue.top().x;
+    }
 
     void Pop() override {
         if (Empty()) return;
@@ -167,10 +171,14 @@ public:
 
     ~SetSorted() override = default;
 
-    std::pair<K, V> Top() const override { return set.begin()->x; }
+    std::pair<K, V> Top() const override {
+        Assert (!Empty());
+        return set.begin()->x;
+    }
 
     void Pop() override {
         if (Empty()) return;
+        valid.erase(set.begin()->x.first);
         set.erase(set.begin());
     }
 
@@ -220,6 +228,7 @@ public:
     ~MapSorted() override = default;
 
     std::pair<K, V> Top() const override {
+        Assert (!Empty());
         using pair = std::pair<const K, V>;
         auto it = std::max_element(map.begin(), map.end(), [](const pair& a, const pair& b) {
             return a.second < b.second || (a.second == b.second && a.first < b.first);

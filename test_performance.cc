@@ -57,8 +57,8 @@ PerformOperations(Sorted &sorted, const std::vector<Operation> &ops, long long i
 }
 
 int main(int argc, const char** argv) {
-    constexpr int NUM_OPERATIONS = 10000000;
-    constexpr int NUM_KEYS = 1000000;
+    constexpr int NUM_OPERATIONS = 1000000;
+    constexpr int NUM_KEYS = 10000;
     constexpr int KEY_LENGTH = 5;
 
     std::random_device rd;  //Will be used to obtain a seed for the random number engine
@@ -98,7 +98,7 @@ int main(int argc, const char** argv) {
 
     SortedInterface<MapSorted<std::string, int>> map;
     auto result3 = PerformOperations(map, ops, duration);
-    std::cout << "set: " << duration << "ms" << std::endl;
+    std::cout << "map: " << duration << "ms" << std::endl;
 
     Assert(result1 == result2 && result2 == result3);
 

@@ -5,7 +5,7 @@
 #include "Sorted.h"
 
 int main() {
-    constexpr int N = 1000000;
+    constexpr int N = 10000;
     constexpr int num_char = 10;
     using pair = std::pair<std::string, int>;
 
