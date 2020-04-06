@@ -1,48 +1,5 @@
-
-#ifndef SORTED_SORTED_H
-#define SORTED_SORTED_H
-
-#include <vector>
-#include <queue>
-#include <set>
-#include <map>
-#include "Utils.h"
-
-template<typename Impl>
-class SortedInterface {
-public:
-    using K = typename Impl::Key;
-    using V = typename Impl::Value;
-
-    SortedInterface() : impl{new Impl} {};
-
-    template<typename Iterator>
-    SortedInterface(Iterator begin, Iterator end) : impl{new Impl{begin, end}} {}
-
-    ~SortedInterface() { delete impl; };
-
-    const std::pair<K, V> &Top() const { return impl->Top(); }
-
-    void Pop() { impl->Pop(); }
-
-    bool Empty() const { return impl->Empty(); }
-
-    void InsertOrUpdate(std::pair<K, V> pair) { impl->InsertOrUpdate(std::move(pair)); }
-
-    void Erase(const K &key) { impl->Erase(key); }
-
-    bool Contain(const K &key) const { return impl->Contain(key); }
-
-    /**
-     * throws exception if key not found
-     * @param key
-     * @return
-     */
-    const V& Peek(const K &key) const { return impl->Peek(key); }
-
-private:
-    Impl* const impl;
-};
+#ifndef SORTED_SORTEDIMPL_H
+#define SORTED_SORTEDIMPL_H
 
 template<typename K, typename V>
 class SortedImplInterface {
@@ -74,7 +31,7 @@ protected:
 
         bool operator<(const Pair &that) const {
             return x.second < that.x.second ||
-                    (x.second == that.x.second && x.first < that.x.first);
+                   (x.second == that.x.second && x.first < that.x.first);
         }
         bool operator>(const Pair &that) const {
             return x.second > that.x.second ||
@@ -327,4 +284,4 @@ private:
     std::map<K, Pair> map;
 };
 
-#endif //SORTED_SORTED_H
+#endif //SORTED_SORTEDIMPL_H

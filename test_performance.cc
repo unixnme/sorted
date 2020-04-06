@@ -1,7 +1,8 @@
 #include <random>
 #include <chrono>
 #include <iostream>
-#include "Sorted.h"
+#include "SortedItf.h"
+#include "SortedImpl.h"
 #include "Utils.h"
 
 enum {

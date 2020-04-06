@@ -2,7 +2,8 @@
 #include <string>
 #include <unordered_map>
 #include "Utils.h"
-#include "Sorted.h"
+#include "SortedItf.h"
+#include "SortedImpl.h"
 
 int main() {
     constexpr int N = 10000;
