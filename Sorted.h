@@ -21,7 +21,7 @@ public:
 
     ~SortedInterface() { delete impl; };
 
-    std::pair<K, V> Top() const { return impl->Top(); }
+    const std::pair<K, V> &Top() const { return impl->Top(); }
 
     void Pop() { impl->Pop(); }
 
@@ -38,7 +38,7 @@ public:
      * @param key
      * @return
      */
-    V Peek(const K &key) const { return impl->Peek(key); }
+    const V& Peek(const K &key) const { return impl->Peek(key); }
 
 private:
     Impl* const impl;
@@ -52,7 +52,7 @@ public:
 
     virtual ~SortedImplInterface() = default;
 
-    virtual std::pair<K, V> Top() const = 0;
+    virtual const std::pair<K, V> &Top() const = 0;
 
     virtual void Pop() = 0;
 
@@ -64,7 +64,7 @@ public:
 
     virtual bool Contain(const K &key) const = 0;
 
-    virtual V Peek(const K &key) const = 0;
+    virtual const V& Peek(const K &key) const = 0;
 
 protected:
     struct Pair {
@@ -103,11 +103,17 @@ public:
 
     ~PriorityQueueSorted() override = default;
 
-    std::pair<K, V> Top() const override {
+    /**
+     * Complexity: O(1)
+     */
+    const std::pair<K, V> &Top() const override {
         Assert (!Empty());
         return queue.top().x;
     }
 
+    /**
+     * Complexity: Amortized O(1)
+     */
     void Pop() override {
         if (Empty()) return;
         valid.erase(queue.top().x.first);
@@ -117,6 +123,9 @@ public:
 
     bool Empty() const override { return queue.empty(); }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     void InsertOrUpdate(std::pair<K, V> pair) override {
         auto it = valid.find(pair.first);
         if (it == valid.end())
@@ -127,6 +136,9 @@ public:
         PopTillValid();
     }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     void Erase(const K &key) override {
         auto it = valid.find(key);
         if (it == valid.end()) return;
@@ -135,13 +147,22 @@ public:
         PopTillValid();
     }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     bool Contain(const K &key) const override {
         return valid.find(key) != valid.end();
     }
 
-    V Peek(const K &key) const override { return valid.at(key); }
+    /**
+     * Complexity: O(lg(N))
+     */
+    const V &Peek(const K &key) const override { return valid.at(key); }
 
 private:
+    /**
+     * Complexity: Amortized O(1)
+     */
     void PopTillValid() {
         while (!queue.empty()) {
             auto it = valid.find(queue.top().x.first);
@@ -171,11 +192,17 @@ public:
 
     ~SetSorted() override = default;
 
-    std::pair<K, V> Top() const override {
+    /**
+     * Complexity: O(1)
+     */
+    const std::pair<K, V> &Top() const override {
         Assert (!Empty());
         return set.begin()->x;
     }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     void Pop() override {
         if (Empty()) return;
         valid.erase(set.begin()->x.first);
@@ -184,6 +211,9 @@ public:
 
     bool Empty() const override { return set.empty(); }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     void InsertOrUpdate(std::pair<K, V> pair) override {
         auto it = valid.find(pair.first);
         if (it == valid.end()) {
@@ -196,6 +226,9 @@ public:
         }
     }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     void Erase(const K &key) override {
         auto it = valid.find(key);
         if (it == valid.end()) return;
@@ -204,11 +237,17 @@ public:
         valid.erase(it);
     }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     bool Contain(const K &key) const override {
         return valid.find(key) != valid.end();
     }
 
-    V Peek(const K &key) const override { return valid.at(key); }
+    /**
+     * Complexity: O(lg(N))
+     */
+    const V &Peek(const K &key) const override { return valid.at(key); }
 
 private:
     using Pair = typename SortedImplInterface<K, V>::Pair;
@@ -222,20 +261,30 @@ public:
     MapSorted() = default;
 
     template<typename Iterator>
-    explicit MapSorted(Iterator begin, Iterator end)
-    : map{begin, end} {}
+    explicit MapSorted(Iterator begin, Iterator end) {
+        for (auto it = begin; it != end; ++it) {
+            map.emplace(it->first, *it);
+        }
+    }
 
     ~MapSorted() override = default;
 
-    std::pair<K, V> Top() const override {
+    /**
+     * Complexity: O(N)
+     */
+    const std::pair<K, V> &Top() const override {
         Assert (!Empty());
-        using pair = std::pair<const K, V>;
-        auto it = std::max_element(map.begin(), map.end(), [](const pair& a, const pair& b) {
-            return a.second < b.second || (a.second == b.second && a.first < b.first);
+        using pair = std::pair<const K, Pair>;
+        auto it = std::max_element(map.begin(), map.end(), [](const pair &a, const pair &b) {
+            return a.second.second < b.second.second ||
+                   (a.second.second == b.second.second && a.second.first < b.second.first);
         });
-        return *it;
+        return it->second;
     }
 
+    /**
+     * Complexity: O(N)
+     */
     void Pop() override {
         if (Empty()) return;
         const auto pair = Top();
@@ -244,25 +293,38 @@ public:
 
     bool Empty() const override { return map.empty(); }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     void InsertOrUpdate(std::pair<K, V> pair) override {
         auto it = map.find(pair.first);
         if (it == map.end()) {
-            map.insert(std::move(pair));
+            map.emplace(pair.first, pair);
         } else {
-            it->second = pair.second;
+            it->second = pair;
         }
     }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     void Erase(const K &key) override { map.erase(key); }
 
+    /**
+     * Complexity: O(lg(N))
+     */
     bool Contain(const K &key) const override {
         return map.find(key) != map.end();
     }
 
-    V Peek(const K &key) const override { return map.at(key); }
+    /**
+     * Complexity: O(lg(N))
+     */
+    const V &Peek(const K &key) const override { return map.at(key).second; }
 
 private:
-    std::map<K, V> map;
+    using Pair = std::pair<K, V>;
+    std::map<K, Pair> map;
 };
 
 #endif //SORTED_SORTED_H

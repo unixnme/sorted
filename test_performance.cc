@@ -57,7 +57,7 @@ PerformOperations(Sorted &sorted, const std::vector<Operation> &ops, long long i
 }
 
 int main(int argc, const char** argv) {
-    constexpr int NUM_OPERATIONS = 1000000;
+    constexpr int NUM_OPERATIONS = 10000000;
     constexpr int NUM_KEYS = 10000;
     constexpr int KEY_LENGTH = 5;
 
