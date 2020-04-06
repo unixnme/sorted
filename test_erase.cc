@@ -30,6 +30,7 @@ int main() {
 
     SortedInterface<PriorityQueueSorted<std::string, int>> pqueue{vector.begin(), vector.end()};
     SortedInterface<SetSorted<std::string, int>> set{vector.begin(), vector.end()};
+    SortedInterface<MapSorted<std::string, int>> smap{vector.begin(), vector.end()};
 
     for (int i = 0; i < N / 100; ++i) {
         int idx;
@@ -38,6 +39,7 @@ int main() {
 
         pqueue.Erase(vector[idx].first);
         set.Erase(vector[idx].first);
+        smap.Erase(vector[idx].first);
         std::swap(vector[idx], vector.back());
         vector.pop_back();
     }
@@ -46,12 +48,13 @@ int main() {
     });
 
     for (auto &p : vector) {
-        Assert (!pqueue.Empty() && !set.Empty());
-        Assert (pqueue.Top() == p && set.Top() == p);
+        Assert (!pqueue.Empty() && !set.Empty() && !smap.Empty());
+        Assert (pqueue.Top() == p && set.Top() == p && smap.Top() == p);
         pqueue.Pop();
         set.Pop();
+        smap.Pop();
     }
-    Assert (pqueue.Empty() && set.Empty());
+    Assert (pqueue.Empty() && set.Empty() && smap.Empty());
 
     return 0;
 }

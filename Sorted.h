@@ -20,7 +20,7 @@ public:
 
     ~SortedInterface() { delete impl; };
 
-    const std::pair<K, V> &Top() const { return impl->Top(); }
+    std::pair<K, V> Top() const { return impl->Top(); }
 
     void Pop() { impl->Pop(); }
 
@@ -37,7 +37,7 @@ public:
      * @param key
      * @return
      */
-    const V& Peek(const K &key) const { return impl->Peek(key); }
+    V Peek(const K &key) const { return impl->Peek(key); }
 
 private:
     Impl* const impl;
@@ -51,7 +51,7 @@ public:
 
     virtual ~SortedImplInterface() = default;
 
-    virtual const std::pair<K, V> &Top() const = 0;
+    virtual std::pair<K, V> Top() const = 0;
 
     virtual void Pop() = 0;
 
@@ -63,7 +63,7 @@ public:
 
     virtual bool Contain(const K &key) const = 0;
 
-    virtual const V& Peek(const K &key) const = 0;
+    virtual V Peek(const K &key) const = 0;
 
 protected:
     struct Pair {
@@ -102,7 +102,7 @@ public:
 
     ~PriorityQueueSorted() override = default;
 
-    const std::pair<K, V> &Top() const override { return queue.top().x; }
+    std::pair<K, V> Top() const override { return queue.top().x; }
 
     void Pop() override {
         if (Empty()) return;
@@ -135,7 +135,7 @@ public:
         return valid.find(key) != valid.end();
     }
 
-    const V& Peek(const K &key) const override { return valid.at(key); }
+    V Peek(const K &key) const override { return valid.at(key); }
 
 private:
     void PopTillValid() {
@@ -167,7 +167,7 @@ public:
 
     ~SetSorted() override = default;
 
-    const std::pair<K, V> &Top() const override { return set.begin()->x; }
+    std::pair<K, V> Top() const override { return set.begin()->x; }
 
     void Pop() override {
         if (Empty()) return;
@@ -200,9 +200,7 @@ public:
         return valid.find(key) != valid.end();
     }
 
-    const V& Peek(const K &key) const override {
-        return valid.at(key);
-    }
+    V Peek(const K &key) const override { return valid.at(key); }
 
 private:
     using Pair = typename SortedImplInterface<K, V>::Pair;
@@ -210,5 +208,52 @@ private:
     std::map<K, V> valid;
 };
 
+template<typename K, typename V>
+class MapSorted : public SortedImplInterface<K, V> {
+public:
+    MapSorted() = default;
+
+    template<typename Iterator>
+    explicit MapSorted(Iterator begin, Iterator end)
+    : map{begin, end} {}
+
+    ~MapSorted() override = default;
+
+    std::pair<K, V> Top() const override {
+        using pair = std::pair<const K, V>;
+        auto it = std::max_element(map.begin(), map.end(), [](const pair& a, const pair& b) {
+            return a.second < b.second || (a.second == b.second && a.first < b.first);
+        });
+        return *it;
+    }
+
+    void Pop() override {
+        if (Empty()) return;
+        const auto pair = Top();
+        map.erase(pair.first);
+    }
+
+    bool Empty() const override { return map.empty(); }
+
+    void InsertOrUpdate(std::pair<K, V> pair) override {
+        auto it = map.find(pair.first);
+        if (it == map.end()) {
+            map.insert(std::move(pair));
+        } else {
+            it->second = pair.second;
+        }
+    }
+
+    void Erase(const K &key) override { map.erase(key); }
+
+    bool Contain(const K &key) const override {
+        return map.find(key) != map.end();
+    }
+
+    V Peek(const K &key) const override { return map.at(key); }
+
+private:
+    std::map<K, V> map;
+};
 
 #endif //SORTED_SORTED_H

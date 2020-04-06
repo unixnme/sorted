@@ -92,11 +92,15 @@ int main(int argc, const char** argv) {
     auto result1 = PerformOperations(pqueue, ops, duration);
     std::cout << "pqueue: " << duration << "ms" << std::endl;
 
-    SortedInterface<PriorityQueueSorted<std::string, int>> set;
+    SortedInterface<SetSorted<std::string, int>> set;
     auto result2 = PerformOperations(set, ops, duration);
     std::cout << "set: " << duration << "ms" << std::endl;
 
-    Assert(result1 == result2);
+    SortedInterface<MapSorted<std::string, int>> map;
+    auto result3 = PerformOperations(map, ops, duration);
+    std::cout << "set: " << duration << "ms" << std::endl;
+
+    Assert(result1 == result2 && result2 == result3);
 
     return 0;
 }

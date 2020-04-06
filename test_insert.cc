@@ -30,24 +30,27 @@ int main() {
 
     SortedInterface<PriorityQueueSorted<std::string, int>> pqueue{vector.begin(), vector.end()};
     SortedInterface<SetSorted<std::string, int>> set{vector.begin(), vector.end()};
+    SortedInterface<MapSorted<std::string, int>> smap{vector.begin(), vector.end()};
 
     for (int i = 0; i < N; ++i) {
         auto idx = idx_dis(gen);
         vector[idx].second = int_dis(gen);
         pqueue.InsertOrUpdate(vector[idx]);
         set.InsertOrUpdate(vector[idx]);
+        smap.InsertOrUpdate(vector[idx]);
     }
     std::sort(vector.begin(), vector.end(), [](const pair& a, const pair& b) {
         return a.second > b.second || (a.second == b.second && a.first > b.first);
     });
 
     for (auto &p : vector) {
-        Assert (!pqueue.Empty() && !set.Empty());
-        Assert (pqueue.Top() == p && set.Top() == p);
+        Assert (!pqueue.Empty() && !set.Empty() && !smap.Empty());
+        Assert (pqueue.Top() == p && set.Top() == p && smap.Top() == p);
         pqueue.Pop();
         set.Pop();
+        smap.Pop();
     }
-    Assert (pqueue.Empty() && set.Empty());
+    Assert (pqueue.Empty() && set.Empty() && smap.Empty());
 
     return 0;
 }
