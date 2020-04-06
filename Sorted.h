@@ -13,6 +13,8 @@ public:
     using K = typename Impl::Key;
     using V = typename Impl::Value;
 
+    SortedInterface() : impl{new Impl} {};
+
     template<typename Iterator>
     SortedInterface(Iterator begin, Iterator end) : impl{new Impl{begin, end}} {}
 
@@ -71,6 +73,8 @@ protected:
 template<typename K, typename V>
 class PriorityQueueSorted : public SortedImplInterface<K, V> {
 public:
+    PriorityQueueSorted() = default;
+
     template<typename Iterator>
     explicit PriorityQueueSorted(Iterator begin, Iterator end)
             : queue{begin, end} {
@@ -120,6 +124,8 @@ private:
 template<typename K, typename V>
 class SetSorted : public SortedImplInterface<K, V> {
 public:
+    SetSorted() = default;
+
     template<typename Iterator>
     explicit SetSorted(Iterator begin, Iterator end)
             : set{begin, end} {

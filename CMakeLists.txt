@@ -3,4 +3,4 @@ project(sorted)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(sorted main.cpp)
+add_executable(sorted test_insert.cpp)
