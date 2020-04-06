@@ -31,11 +31,13 @@ int main() {
     SortedInterface<PriorityQueueSorted<std::string, int>> pqueue{vector.begin(), vector.end()};
     SortedInterface<SetSorted<std::string, int>> set{vector.begin(), vector.end()};
 
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < N / 100; ++i) {
         auto idx = idx_dis(gen);
-        vector[idx].second = int_dis(gen);
-        pqueue.Insert(vector[idx]);
-        set.Insert(vector[idx]);
+        if (idx >= vector.size()) continue;
+        pqueue.Erase(vector[idx].first);
+        set.Erase(vector[idx].first);
+        std::swap(vector[idx], vector.back());
+        vector.pop_back();
     }
     std::sort(vector.begin(), vector.end(), [](const pair& a, const pair& b) {
         return a.second > b.second || (a.second == b.second && a.first > b.first);

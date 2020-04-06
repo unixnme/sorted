@@ -28,6 +28,8 @@ public:
 
     void Insert(std::pair<K, V> pair) { impl->Insert(std::move(pair)); }
 
+    void Erase(K key) { impl->Erase(std::move(key)); }
+
 private:
     Impl *impl;
 };
@@ -47,6 +49,8 @@ public:
     virtual bool Empty() const = 0;
 
     virtual void Insert(std::pair<K, V> pair) = 0;
+
+    virtual void Erase(K key) = 0;
 
 protected:
     struct Pair {
@@ -105,6 +109,14 @@ public:
         PopTillValid();
     }
 
+    void Erase(K key) override {
+        auto it = valid.find(key);
+        if (it == valid.end()) return;
+
+        valid.erase(it);
+        PopTillValid();
+    }
+
 private:
     void PopTillValid() {
         while (!queue.empty()) {
@@ -151,6 +163,14 @@ public:
             it->second = pair.second;
             set.emplace(std::move(pair));
         }
+    }
+
+    void Erase(K key) override {
+        auto it = valid.find(key);
+        if (it == valid.end()) return;
+
+        set.erase(Pair{*it});
+        valid.erase(it);
     }
 
 private:
