@@ -37,6 +37,7 @@ PerformOperations(Sorted &sorted, const std::vector<Operation> &ops, long long i
                 sorted.Erase(key);
                 break;
             case TOP:
+                sorted.InsertOrUpdate({key, operation.value});
                 if (!sorted.Empty())
                     result.push_back(sorted.Top());
                 break;
@@ -44,6 +45,7 @@ PerformOperations(Sorted &sorted, const std::vector<Operation> &ops, long long i
                 sorted.Pop();
                 break;
             case PEEK:
+                sorted.InsertOrUpdate({key, operation.value});
                 if (sorted.Contain(key))
                     result.emplace_back(key, sorted.Peek(key));
                 break;
@@ -96,11 +98,11 @@ int main(int argc, const char** argv) {
     auto result2 = PerformOperations(set, ops, duration);
     std::cout << "set: " << duration << "ms" << std::endl;
 
-    SortedInterface<MapSorted<std::string, int>> map;
-    auto result3 = PerformOperations(map, ops, duration);
-    std::cout << "map: " << duration << "ms" << std::endl;
+//    SortedInterface<MapSorted<std::string, int>> map;
+//    auto result3 = PerformOperations(map, ops, duration);
+//    std::cout << "map: " << duration << "ms" << std::endl;
 
-    Assert(result1 == result2 && result2 == result3);
+    Assert(result1 == result2);
 
     return 0;
 }
