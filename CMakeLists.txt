@@ -3,5 +3,5 @@ project(sorted)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(test_insert test_insert.cpp)
-add_executable(test_erase test_erase.cpp)
+add_executable(test_insert test_insert.cc)
+add_executable(test_erase test_erase.cc)

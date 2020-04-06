@@ -32,8 +32,10 @@ int main() {
     SortedInterface<SetSorted<std::string, int>> set{vector.begin(), vector.end()};
 
     for (int i = 0; i < N / 100; ++i) {
-        auto idx = idx_dis(gen);
-        if (idx >= vector.size()) continue;
+        int idx;
+        do idx = idx_dis(gen);
+        while (idx >= vector.size());
+
         pqueue.Erase(vector[idx].first);
         set.Erase(vector[idx].first);
         std::swap(vector[idx], vector.back());
