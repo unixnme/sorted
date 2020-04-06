@@ -8,7 +8,8 @@ enum {
     INSERT = 0,
     ERASE = 1,
     TOP = 2,
-    POP = 3
+    POP = 3,
+    PEEK = 4
 };
 
 std::vector<std::string> keys;
@@ -27,12 +28,13 @@ PerformOperations(Sorted &sorted, const std::vector<Operation> &ops, long long i
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<std::pair<std::string, int>> result;
     for (auto &operation : ops) {
+        const auto &key = keys[operation.key];
         switch (operation.op) {
             case INSERT:
-                sorted.Insert({keys[operation.key], operation.value});
+                sorted.InsertOrUpdate({key, operation.value});
                 break;
             case ERASE:
-                sorted.Erase(keys[operation.key]);
+                sorted.Erase(key);
                 break;
             case TOP:
                 if (!sorted.Empty())
@@ -40,6 +42,10 @@ PerformOperations(Sorted &sorted, const std::vector<Operation> &ops, long long i
                 break;
             case POP:
                 sorted.Pop();
+                break;
+            case PEEK:
+                if (sorted.Contain(key))
+                    result.emplace_back(key, sorted.Peek(key));
                 break;
             default:
                 Assert(false);
@@ -51,14 +57,14 @@ PerformOperations(Sorted &sorted, const std::vector<Operation> &ops, long long i
 }
 
 int main(int argc, const char** argv) {
-    constexpr int NUM_OPERATIONS = 100000000;
-    constexpr int NUM_KEYS = 10000000;
+    constexpr int NUM_OPERATIONS = 10000000;
+    constexpr int NUM_KEYS = 1000000;
     constexpr int KEY_LENGTH = 5;
 
     std::random_device rd;  //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> char_dis(0, 25);
-    std::uniform_int_distribution<> op_dis(0, 3);
+    std::uniform_int_distribution<> op_dis(0, PEEK);
     std::uniform_int_distribution<> val_dis{0, 100000000};
     std::uniform_int_distribution<> idx_dis{0, NUM_KEYS};
 

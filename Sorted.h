@@ -26,12 +26,21 @@ public:
 
     bool Empty() const { return impl->Empty(); }
 
-    void Insert(std::pair<K, V> pair) { impl->Insert(std::move(pair)); }
+    void InsertOrUpdate(std::pair<K, V> pair) { impl->InsertOrUpdate(std::move(pair)); }
 
-    void Erase(K key) { impl->Erase(std::move(key)); }
+    void Erase(const K &key) { impl->Erase(key); }
+
+    bool Contain(const K &key) const { return impl->Contain(key); }
+
+    /**
+     * throws exception if key not found
+     * @param key
+     * @return
+     */
+    const V& Peek(const K &key) const { return impl->Peek(key); }
 
 private:
-    Impl *impl;
+    Impl* const impl;
 };
 
 template<typename K, typename V>
@@ -48,9 +57,13 @@ public:
 
     virtual bool Empty() const = 0;
 
-    virtual void Insert(std::pair<K, V> pair) = 0;
+    virtual void InsertOrUpdate(std::pair<K, V> pair) = 0;
 
-    virtual void Erase(K key) = 0;
+    virtual void Erase(const K &key) = 0;
+
+    virtual bool Contain(const K &key) const = 0;
+
+    virtual const V& Peek(const K &key) const = 0;
 
 protected:
     struct Pair {
@@ -100,7 +113,7 @@ public:
 
     bool Empty() const override { return queue.empty(); }
 
-    void Insert(std::pair<K, V> pair) override {
+    void InsertOrUpdate(std::pair<K, V> pair) override {
         auto it = valid.find(pair.first);
         if (it == valid.end())
             valid.emplace(pair);
@@ -110,13 +123,19 @@ public:
         PopTillValid();
     }
 
-    void Erase(K key) override {
+    void Erase(const K &key) override {
         auto it = valid.find(key);
         if (it == valid.end()) return;
 
         valid.erase(it);
         PopTillValid();
     }
+
+    bool Contain(const K &key) const override {
+        return valid.find(key) != valid.end();
+    }
+
+    const V& Peek(const K &key) const override { return valid.at(key); }
 
 private:
     void PopTillValid() {
@@ -157,7 +176,7 @@ public:
 
     bool Empty() const override { return set.empty(); }
 
-    void Insert(std::pair<K, V> pair) override {
+    void InsertOrUpdate(std::pair<K, V> pair) override {
         auto it = valid.find(pair.first);
         if (it == valid.end()) {
             valid.insert(pair);
@@ -169,7 +188,7 @@ public:
         }
     }
 
-    void Erase(K key) override {
+    void Erase(const K &key) override {
         auto it = valid.find(key);
         if (it == valid.end()) return;
 
@@ -177,10 +196,19 @@ public:
         valid.erase(it);
     }
 
+    bool Contain(const K &key) const override {
+        return valid.find(key) != valid.end();
+    }
+
+    const V& Peek(const K &key) const override {
+        return valid.at(key);
+    }
+
 private:
     using Pair = typename SortedImplInterface<K, V>::Pair;
     std::set<Pair, std::greater<Pair>> set;
     std::map<K, V> valid;
 };
+
 
 #endif //SORTED_SORTED_H

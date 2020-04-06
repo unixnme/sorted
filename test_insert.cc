@@ -34,8 +34,8 @@ int main() {
     for (int i = 0; i < N; ++i) {
         auto idx = idx_dis(gen);
         vector[idx].second = int_dis(gen);
-        pqueue.Insert(vector[idx]);
-        set.Insert(vector[idx]);
+        pqueue.InsertOrUpdate(vector[idx]);
+        set.InsertOrUpdate(vector[idx]);
     }
     std::sort(vector.begin(), vector.end(), [](const pair& a, const pair& b) {
         return a.second > b.second || (a.second == b.second && a.first > b.first);
