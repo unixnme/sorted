@@ -2,12 +2,12 @@
 #define SORTED_SORTEDIMPL_H
 
 template<typename K, typename V>
-class SortedImplInterface {
+class SortedImpl {
 public:
     using Key = K;
     using Value = V;
 
-    virtual ~SortedImplInterface() = default;
+    virtual ~SortedImpl() = default;
 
     virtual const std::pair<K, V> &Top() const = 0;
 
@@ -25,9 +25,9 @@ public:
 
 protected:
     struct Pair {
-        explicit Pair(std::pair<K, V> x) : x{x} {}
+        explicit Pair(std::pair<K, V> x) : x{std::move(x)} {}
 
-        std::pair<K, V> x;
+        const std::pair<K, V> x;
 
         bool operator<(const Pair &that) const {
             return x.second < that.x.second ||
@@ -46,7 +46,7 @@ protected:
  * @tparam V
  */
 template<typename K, typename V>
-class PriorityQueueSorted : public SortedImplInterface<K, V> {
+class PriorityQueueSorted : public SortedImpl<K, V> {
 public:
     PriorityQueueSorted() = default;
 
@@ -130,13 +130,13 @@ private:
         }
     }
 
-    using Pair = typename SortedImplInterface<K, V>::Pair;
+    using Pair = typename SortedImpl<K, V>::Pair;
     std::priority_queue<Pair> queue;
     std::map<K, V> valid;
 };
 
 template<typename K, typename V>
-class SetSorted : public SortedImplInterface<K, V> {
+class SetSorted : public SortedImpl<K, V> {
 public:
     SetSorted() = default;
 
@@ -207,13 +207,13 @@ public:
     const V &Peek(const K &key) const override { return valid.at(key); }
 
 private:
-    using Pair = typename SortedImplInterface<K, V>::Pair;
+    using Pair = typename SortedImpl<K, V>::Pair;
     std::set<Pair, std::greater<Pair>> set;
     std::map<K, V> valid;
 };
 
 template<typename K, typename V>
-class MapSorted : public SortedImplInterface<K, V> {
+class MapSorted : public SortedImpl<K, V> {
 public:
     MapSorted() = default;
 
