@@ -27,7 +27,7 @@ protected:
     struct Pair {
         explicit Pair(std::pair<K, V> x) : x{std::move(x)} {}
 
-        const std::pair<K, V> x;
+        std::pair<K, V> x;
 
         bool operator<(const Pair &that) const {
             return x.second < that.x.second ||
