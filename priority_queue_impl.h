@@ -1,7 +1,7 @@
 #ifndef HARA_PRIORITY_QUEUE_IMPL_H
 #define HARA_PRIORITY_QUEUE_IMPL_H
 
-template<typename K, typename V>
+template<typename K, typename V, typename Compare = std::less<V>>
 class PriorityQueueImpl {
 public:
     using Key = K;
@@ -23,21 +23,37 @@ public:
 
     virtual bool Contain(const K &key) const = 0;
 
-    virtual const V& Peek(const K &key) const = 0;
+    virtual const V &Peek(const K &key) const = 0;
 
 protected:
+    static inline bool less(const V &a, const V &b) { return Compare()(a, b); }
+
+    static inline bool greater(const V &a, const V &b) { return less(b, a); }
+
+    static inline bool equal(const V &a, const V &b) { return !(less(a, b) || greater(a, b)); }
+
+    static inline bool notequal(const V &a, const V &b) { return !equal(a, b); }
+
     struct Pair {
         explicit Pair(std::pair<K, V> x) : x{std::move(x)} {}
 
         std::pair<K, V> x;
 
         bool operator<(const Pair &that) const {
-            return x.second < that.x.second ||
-                   (x.second == that.x.second && x.first < that.x.first);
+            return less(x.second, that.x.second) ||
+                   (equal(x.second, that.x.second) && x.first < that.x.first);
         }
+
+        bool operator==(const Pair &that) const {
+            return equal(x.second, that.x.second) && x.first == that.x.first;
+        }
+
+        bool operator!=(const Pair &that) const {
+            return !(*this == that);
+        }
+
         bool operator>(const Pair &that) const {
-            return x.second > that.x.second ||
-                   (x.second == that.x.second && x.first > that.x.first);
+            return that < *this;
         }
     };
 };
@@ -47,8 +63,8 @@ protected:
  * @tparam K
  * @tparam V
  */
-template<typename K, typename V>
-class PriorityQueueSorted : public PriorityQueueImpl<K, V> {
+template<typename K, typename V, typename Compare = std::less<V>>
+class PriorityQueueSorted : public PriorityQueueImpl<K, V, Compare> {
 public:
     PriorityQueueSorted() = default;
 
@@ -127,20 +143,21 @@ private:
     void PopTillValid() {
         while (!queue.empty()) {
             auto it = valid.find(queue.top().x.first);
-            if (it == valid.end() || it->second != queue.top().x.second)
+            if (it == valid.end()
+                || PriorityQueueImpl<K, V, Compare>::notequal(it->second, queue.top().x.second))
                 // this is a spurious element
                 queue.pop();
             else break;
         }
     }
 
-    using Pair = typename PriorityQueueImpl<K, V>::Pair;
+    using Pair = typename PriorityQueueImpl<K, V, Compare>::Pair;
     std::priority_queue<Pair> queue;
     std::map<K, V> valid;
 };
 
-template<typename K, typename V>
-class SetSorted : public PriorityQueueImpl<K, V> {
+template<typename K, typename V, typename Compare = std::less<V>>
+class SetSorted : public PriorityQueueImpl<K, V, Compare> {
 public:
     SetSorted() = default;
 
@@ -172,7 +189,7 @@ public:
 
     bool Empty() const override { return set.empty(); }
 
-    bool Size() const override { return set.size(); }
+    size_t Size() const override { return set.size(); }
 
     /**
      * Complexity: O(lg(N))
@@ -213,13 +230,13 @@ public:
     const V &Peek(const K &key) const override { return valid.at(key); }
 
 private:
-    using Pair = typename PriorityQueueImpl<K, V>::Pair;
+    using Pair = typename PriorityQueueImpl<K, V, Compare>::Pair;
     std::set<Pair, std::greater<Pair>> set;
     std::map<K, V> valid;
 };
 
-template<typename K, typename V>
-class MapSorted : public PriorityQueueImpl<K, V> {
+template<typename K, typename V, typename Compare = std::less<V>>
+class MapSorted : public PriorityQueueImpl<K, V, Compare> {
 public:
     MapSorted() = default;
 
@@ -239,8 +256,9 @@ public:
         Assert (!Empty());
         using pair = std::pair<const K, Pair>;
         auto it = std::max_element(map.begin(), map.end(), [](const pair &a, const pair &b) {
-            return a.second.second < b.second.second ||
-                   (a.second.second == b.second.second && a.second.first < b.second.first);
+            return PriorityQueueImpl<K, V, Compare>::less(a.second.second, b.second.second) ||
+                   (PriorityQueueImpl<K, V, Compare>::equal(a.second.second, b.second.second) &&
+                    a.second.first < b.second.first);
         });
         return it->second;
     }
@@ -256,7 +274,7 @@ public:
 
     bool Empty() const override { return map.empty(); }
 
-    bool Size() const override { return map.size(); }
+    size_t Size() const override { return map.size(); }
 
     /**
      * Complexity: O(lg(N))
