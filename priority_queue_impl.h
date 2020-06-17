@@ -25,6 +25,8 @@ public:
 
     virtual const V &Peek(const K &key) const = 0;
 
+    virtual std::vector<Key> Keys() const = 0;
+
 protected:
     static inline bool less(const V &a, const V &b) { return Compare()(a, b); }
 
@@ -132,6 +134,15 @@ public:
     }
 
     /**
+    * Complexity: O(N)
+    */
+    std::vector<K> Keys() const override {
+        std::vector<K> keys;
+        for (const auto &pair : valid) keys.push_back(pair.first);
+        return keys;
+    }
+
+    /**
      * Complexity: O(lg(N))
      */
     const V &Peek(const K &key) const override { return valid.at(key); }
@@ -225,6 +236,15 @@ public:
     }
 
     /**
+    * Complexity: O(N)
+    */
+    std::vector<K> Keys() const override {
+        std::vector<K> keys;
+        for (const auto &pair : valid) keys.push_back(pair.first);
+        return keys;
+    }
+
+    /**
      * Complexity: O(lg(N))
      */
     const V &Peek(const K &key) const override { return valid.at(key); }
@@ -298,6 +318,15 @@ public:
      */
     bool Contain(const K &key) const override {
         return map.find(key) != map.end();
+    }
+
+    /**
+    * Complexity: O(N)
+    */
+    std::vector<K> Keys() const override {
+        std::vector<K> keys;
+        for (const auto &pair : map) keys.push_back(pair.first);
+        return keys;
     }
 
     /**

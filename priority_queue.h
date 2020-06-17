@@ -35,6 +35,8 @@ public:
 
     bool Contain(const K &key) const { return impl->Contain(key); }
 
+    std::vector<K> Keys() const { return impl->Keys(); }
+
     /**
      * throws exception if key not found
      * @param key
