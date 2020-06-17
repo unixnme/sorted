@@ -42,10 +42,10 @@ public:
      * @param key
      * @return
      */
-    const V& Peek(const K &key) const { return impl->Peek(key); }
+    const V &Peek(const K &key) const { return impl->Peek(key); }
 
 private:
-    Impl* const impl;
+    Impl *const impl;
 };
 
 

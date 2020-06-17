@@ -21,7 +21,7 @@ public:
 
     virtual bool Contain(const K &key) const = 0;
 
-    virtual const V& Peek(const K &key) const = 0;
+    virtual const V &Peek(const K &key) const = 0;
 
 protected:
     struct Pair {
@@ -33,6 +33,7 @@ protected:
             return x.second < that.x.second ||
                    (x.second == that.x.second && x.first < that.x.first);
         }
+
         bool operator>(const Pair &that) const {
             return x.second > that.x.second ||
                    (x.second == that.x.second && x.first > that.x.first);
